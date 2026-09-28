@@ -11,7 +11,7 @@
 <div class="screen" id="s3"><h1>دي ليكِ يا Zoza ❤️</h1><div class="video-wrap"><video id="vid" controls playsinline preload="metadata"><source src="WhatsApp%20Video%202026-09-28%20at%208.50.08%20PM.mp4" type="video/mp4"></video></div><button class="btn yes" onclick="go(4)">خلصت… كمّلي 🥹</button></div>
 <div class="screen" id="s4"><div class="badge" id="gameEmoji">❤️</div><h1 class="question" id="gameQ">طيب يا Zoza… نتصالح؟</h1><p class="lead" id="gameText">مش بطلب ننسى اللي حصل، بطلب نبدأ الكلام بهدوء ونصلّح اللي بينا.</p><div class="tease" id="tease">اختاري براحتك… تقريبًا 😇</div><div class="row"><button class="btn yes" id="yesBtn" onclick="celebrate()">نتصالح ❤️</button><button class="btn no" id="noBtn">لسه زعلانة 😒</button></div><p class="small" id="counter"></p></div>
 <div class="screen" id="s5"><div class="badge">🥹❤️</div><h1>وحشتيني يا حياتي ❤️</h1><p class="lead">خلاص بقى… كفاية زعل يا Zoza.<br><strong>وحشتيني أوي يا حياتي ❤️</strong></p><button class="btn yes heart-btn" onclick="this.innerHTML='❤️';this.style.fontSize='42px';this.style.padding='12px 28px';document.getElementById('last').innerHTML='ده قلبي… رجع مكانه لما اتصالحنا ❤️'">اضغطي هنا ❤️</button><p class="small" id="last"></p></div>
-<div class="screen" id="s6"><h1>🎮 مغامرة Zoza ❤️</h1><p class="lead" id="gameLove">اجمعي القلوب ووصلّي للبوابة… كل Level مخبّي لكِ رسالة ❤️</p><div style="display:flex;justify-content:space-between;font-weight:bold;margin:8px"><span id="lvl">Level 1</span><span id="score">❤️ 0 / 5</span></div><div style="font-weight:800;color:#5b2038;margin:4px 0 10px">👑 الشخصية: Zoza</div><canvas id="loveGame" width="380" height="420" style="width:100%;max-width:380px;border-radius:20px;background:linear-gradient(#ead0da,#f8eef2);border:2px solid #9f3f62;touch-action:none"></canvas><div style="display:flex;justify-content:center;gap:16px;margin-top:12px"><button class="btn no" id="left">◀</button><button class="btn yes" id="jump">⬆ قفز</button><button class="btn no" id="right">▶</button></div><button class="btn no" style="margin-top:12px" onclick="stopGame();go(1)">↩ رجوع</button></div></section></main><script>
+<div class="screen" id="s6"><h1>🎮 مغامرة Zoza ❤️</h1><div style="font-size:12px;font-weight:800;color:#9f3f62">GAME v3 • 8 عوالم مختلفة</div><p class="lead" id="gameLove">اجمعي القلوب ووصلّي للبوابة… كل Level مخبّي لكِ رسالة ❤️</p><div style="display:flex;justify-content:space-between;font-weight:bold;margin:8px"><span id="lvl">Level 1</span><span id="score">❤️ 0 / 5</span></div><div style="font-weight:800;color:#5b2038;margin:4px 0 10px">👑 الشخصية: Zoza</div><canvas id="loveGame" width="380" height="420" style="width:100%;max-width:380px;border-radius:20px;background:linear-gradient(#ead0da,#f8eef2);border:2px solid #9f3f62;touch-action:none"></canvas><div style="display:flex;justify-content:center;gap:16px;margin-top:12px"><button class="btn no" id="left">◀</button><button class="btn yes" id="jump">⬆ قفز</button><button class="btn no" id="right">▶</button></div><button class="btn no" style="margin-top:12px" onclick="stopGame();go(1)">↩ رجوع</button></div></section></main><script>
 let gameRAF=null,G=null,keys={left:false,right:false},level=1,got=0;
 const loveLines=['بحبك كتير يا حياتي ❤️','وحشتيني يا Zoza 🌹','ضحكتك أحلى حاجة في يومي ❤️','ممنوع الزعل هنا 😂','إنتِ أجمل جائزة 👑','كل الطرق بتوصلني ليكي 💗','قلبي اختارك ❤️','يا بخت اللعبة بيكي 🌸','بحبك أكتر من اللي فات 😌','أنا وإنتِ Team واحد ❤️','وردة ليكي 🌹','إنتِ أحلى Level','خدي قلب زيادة 💗','بحب عنادك… أوقات 😂','Checkpoint: بوسة 😘','قربنا يا حياتي ✨','ولا Level أصعب من زعلك 😂','إنتِ الـPrincess 👑','خطوات لقلبي ❤️','YOU WIN MY HEART ❤️'];
 const worlds=[
@@ -22,13 +22,31 @@ const worlds=[
  {sky:'#eadcf4',ground:'#563c72',plat:'#8763a6',deco:['✨','🌙'],name:'عالم القلوب'}
 ];
 function startGame(){setTimeout(()=>{const cv=document.getElementById('loveGame');if(!cv)return;G={cv,ctx:cv.getContext('2d'),p:{x:35,y:310,w:25,h:38,vy:0,on:false},hearts:[],plats:[],signs:[],worldW:1500,cam:0,bound:false};loadLevel();bindGame();loop()},100)}
-function loadLevel(){if(!G)return;got=0;const w=worlds[Math.floor((level-1)/4)%worlds.length];G.theme=w;G.worldW=1450+(level%4)*180;G.cam=0;G.p.x=35;G.p.y=300;G.p.vy=0;G.hearts=[];G.plats=[];G.signs=[];
+function loadLevel(){if(!G)return;got=0;
+const themes=[
+{sky:'#f7dce5',ground:'#78304d',plat:'#a94e70',deco:['🌸','🌷'],name:'🌸 حديقة الورود'},
+{sky:'#dcecff',ground:'#465b86',plat:'#7390c5',deco:['☁️','🏙️'],name:'🏙️ مدينة الأحلام'},
+{sky:'#f9dfb9',ground:'#85533d',plat:'#c68758',deco:['🌵','☀️'],name:'🏜️ الصحراء'},
+{sky:'#ccecf2',ground:'#276778',plat:'#55a5b5',deco:['🌊','🐚'],name:'🌊 الشاطئ'},
+{sky:'#201b3d',ground:'#533d78',plat:'#8c6db4',deco:['🌙','⭐'],name:'🌙 عالم الليل'},
+{sky:'#d8f0dc',ground:'#38664a',plat:'#68a77d',deco:['🌲','🍄'],name:'🌲 الغابة'},
+{sky:'#f4d7ef',ground:'#713f70',plat:'#ad6aa8',deco:['🍭','🧁'],name:'🍬 Candy Land'},
+{sky:'#dfe5eb',ground:'#49515c',plat:'#77818e',deco:['🏁','🚗'],name:'🏎️ طريق السيارات'}
+];
+let w=themes[(level-1)%themes.length];G.theme=w;G.worldW=1500+((level-1)%5)*170;G.cam=0;G.p.x=35;G.p.y=280;G.p.vy=0;G.hearts=[];G.plats=[];G.signs=[];
 document.getElementById('lvl').textContent='Level '+level+' · '+w.name;document.getElementById('score').textContent='❤️ 0 / 8';document.getElementById('gameLove').textContent=loveLines[(level-1)%20];
-for(let x=0;x<G.worldW;x+=240){if(((x/240+level)%4)!==2)G.plats.push({x:x,y:360,w:205,h:60});}
-for(let i=0;i<6+(level%4);i++){let x=150+i*175;let y=285-(i%3)*55;G.plats.push({x,y,w:105+(i%2)*35,h:18});}
-for(let i=0;i<8;i++){let x=115+i*(G.worldW-220)/7;G.hearts.push({x,y:235-(i%3)*48,taken:false});}
-G.signs=[{x:220,y:190,text:'بحبك يا حياتي ❤️'},{x:650,y:145,text:loveLines[(level+4)%20]},{x:1050,y:205,text:'كمّلي يا Zoza 🌹'}];}
-function bindGame(){if(G.bound)return;G.bound=true;const hold=(id,k)=>{let b=document.getElementById(id);b.onpointerdown=e=>{e.preventDefault();keys[k]=true};b.onpointerup=b.onpointercancel=b.onpointerleave=()=>keys[k]=false};hold('left','left');hold('right','right');document.getElementById('jump').onpointerdown=e=>{e.preventDefault();if(G.p.on){G.p.vy=-12;G.p.on=false}}}
+let type=(level-1)%8;
+if(type===0){for(let x=0;x<G.worldW;x+=260)G.plats.push({x,y:360,w:205,h:60});for(let i=0;i<7;i++)G.plats.push({x:180+i*180,y:285-(i%2)*65,w:115,h:18})}
+if(type===1){for(let x=0;x<G.worldW;x+=330)G.plats.push({x,y:360,w:230,h:60});for(let i=0;i<8;i++)G.plats.push({x:130+i*165,y:320-(i%4)*55,w:95,h:18})}
+if(type===2){for(let x=0;x<G.worldW;x+=290)G.plats.push({x,y:365,w:180,h:55});for(let i=0;i<6;i++)G.plats.push({x:240+i*210,y:250+(i%2)*65,w:140,h:20})}
+if(type===3){for(let x=0;x<G.worldW;x+=380)G.plats.push({x,y:370,w:280,h:50});for(let i=0;i<9;i++)G.plats.push({x:120+i*155,y:300-Math.sin(i)*70,w:90,h:16})}
+if(type===4){for(let x=0;x<G.worldW;x+=250)G.plats.push({x,y:365,w:165,h:55});for(let i=0;i<10;i++)G.plats.push({x:100+i*145,y:300-(i%5)*42,w:80,h:16})}
+if(type===5){for(let x=0;x<G.worldW;x+=310)G.plats.push({x,y:360,w:240,h:60});for(let i=0;i<8;i++)G.plats.push({x:170+i*170,y:i%2?220:295,w:125,h:18})}
+if(type===6){for(let x=0;x<G.worldW;x+=275)G.plats.push({x,y:365,w:210,h:55});for(let i=0;i<8;i++)G.plats.push({x:140+i*180,y:270-(i%3)*45,w:105,h:18})}
+if(type===7){for(let x=0;x<G.worldW;x+=420)G.plats.push({x,y:365,w:350,h:55});for(let i=0;i<7;i++)G.plats.push({x:230+i*210,y:300-(i%2)*70,w:150,h:18})}
+for(let i=0;i<8;i++){let x=120+i*(G.worldW-230)/7;let y=220+(i%3)*42;G.hearts.push({x,y,taken:false})}
+G.signs=[{x:250,y:145,text:'بحبك يا حياتي ❤️'},{x:720,y:175,text:loveLines[(level+5)%20]},{x:G.worldW-390,y:130,text:'يلا يا Zoza 🌹'}];
+}function bindGame(){if(G.bound)return;G.bound=true;const hold=(id,k)=>{let b=document.getElementById(id);b.onpointerdown=e=>{e.preventDefault();keys[k]=true};b.onpointerup=b.onpointercancel=b.onpointerleave=()=>keys[k]=false};hold('left','left');hold('right','right');document.getElementById('jump').onpointerdown=e=>{e.preventDefault();if(G.p.on){G.p.vy=-12;G.p.on=false}}}
 function drawGirl(ctx,x,y){ctx.save();ctx.translate(x,y);ctx.fillStyle='#efb4a5';ctx.beginPath();ctx.arc(13,5,8,0,7);ctx.fill();ctx.fillStyle='#442535';ctx.beginPath();ctx.arc(13,3,10,Math.PI,Math.PI*2);ctx.fill();ctx.fillRect(4,3,5,15);ctx.fillRect(18,3,5,15);ctx.fillStyle='#9f3f62';ctx.beginPath();ctx.moveTo(13,14);ctx.lineTo(1,34);ctx.lineTo(25,34);ctx.closePath();ctx.fill();ctx.fillStyle='#f4d5df';ctx.fillRect(6,33,5,7);ctx.fillRect(17,33,5,7);ctx.font='15px Arial';ctx.fillText('👑',5,-8);ctx.restore()}
 function loop(){if(!G)return;let {ctx,cv,p}=G,w=G.theme;if(keys.left)p.x-=4.2;if(keys.right)p.x+=4.2;p.x=Math.max(0,Math.min(G.worldW-p.w,p.x));p.vy+=.62;p.y+=p.vy;p.on=false;
 G.plats.forEach(q=>{if(p.vy>=0&&p.x+p.w>q.x&&p.x<q.x+q.w&&p.y+p.h>=q.y&&p.y+p.h<=q.y+18){p.y=q.y-p.h;p.vy=0;p.on=true}});
