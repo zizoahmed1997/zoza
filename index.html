@@ -37,6 +37,17 @@ const rounds=[
 ];
 let tries=0,no=document.getElementById('noBtn');
 function dodge(e){if(e)e.preventDefault();let r=rounds[tries%rounds.length];document.getElementById('gameEmoji').textContent=r[0];document.getElementById('gameQ').textContent=r[1];document.getElementById('gameText').textContent=r[2];document.getElementById('tease').textContent=r[3];tries++;document.getElementById('counter').textContent='محاولة الهروب رقم '+tries+' 😂';let card=document.getElementById('card').getBoundingClientRect();no.style.position='fixed';no.style.zIndex='20';let maxX=Math.max(20,card.width-no.offsetWidth-35),maxY=Math.max(40,card.height-no.offsetHeight-180);let mode=tries%4;if(mode===0){no.style.left=(card.left+15)+'px';no.style.top=(card.top+120+Math.random()*maxY)+'px'}else if(mode===1){no.style.left=(card.left+15+maxX)+'px';no.style.top=(card.top+120+Math.random()*maxY)+'px'}else{no.style.left=(card.left+15+Math.random()*maxX)+'px';no.style.top=(card.top+120+Math.random()*maxY)+'px'}document.getElementById('yesBtn').style.transform='scale('+Math.min(1+tries*.035,1.5)+')';}
-['mouseenter','touchstart','pointerdown'].forEach(ev=>no.addEventListener(ev,dodge,{passive:false}));
+let locked=false;
+function attempt(e){
+ if(e)e.preventDefault();
+ if(locked)return;
+ locked=true;
+ dodge(e);
+ setTimeout(()=>{ no.style.position='relative'; no.style.left='auto'; no.style.top='auto'; no.style.zIndex='auto'; locked=false; },650);
+}
+no.addEventListener('click',attempt);
+no.addEventListener('pointerdown',attempt,{passive:false});
+no.addEventListener('touchstart',attempt,{passive:false});
+no.addEventListener('mouseenter',attempt);
 function celebrate(){no.style.display='none';go(5);for(let i=0;i<70;i++){let x=document.createElement('i');x.className='confetti';x.style.left=Math.random()*100+'vw';x.style.background='hsl('+(330+Math.random()*55)+' 80% 70%)';x.style.animationDelay=Math.random()*.8+'s';document.body.appendChild(x);setTimeout(()=>x.remove(),4200)}}for(let i=0;i<16;i++){let h=document.createElement('span');h.className='heart';h.textContent='❤';h.style.left=Math.random()*100+'%';h.style.animationDelay=(-Math.random()*10)+'s';document.getElementById('bg').appendChild(h)}
 </script></body></html>
