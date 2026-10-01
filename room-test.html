@@ -1,0 +1,15 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Zoza Room Test</title><style>body{font-family:Tahoma;background:#f3dce5;color:#432432;display:grid;place-items:center;min-height:100vh;margin:0}.c{background:#fff;padding:30px;border-radius:25px;width:min(500px,90%);box-shadow:0 15px 45px #5b203833}input,button{width:100%;padding:14px;margin:7px 0;border-radius:15px;border:1px solid #c77b98;font-size:16px;box-sizing:border-box}button{background:#8f3a5b;color:#fff;font-weight:bold;cursor:pointer}#out{margin-top:15px;padding:14px;border-radius:14px;background:#f8eef2;min-height:24px;white-space:pre-wrap}</style></head><body><div class="c"><h1>💗 Zoza Together</h1><input id="n" value="Zizo"><button id="b">✨ إنشاء غرفة خاصة</button><div id="out">جاهز للاختبار…</div></div><script>
+const U='https://rkebomshpuwllklvfpaw.supabase.co/rest/v1/rooms';
+const K='sb_publishable_WXN_0YbN-zOluH_4-EmazQ_nWzk0m7d';
+document.getElementById('b').addEventListener('click',async()=>{
+ const o=document.getElementById('out');o.textContent='⏳ الزر يعمل… جاري الاتصال بـ Supabase';
+ const code=Math.random().toString(36).slice(2,7).toUpperCase();
+ const id=(crypto.randomUUID?crypto.randomUUID():Date.now().toString());
+ try{
+  const r=await fetch(U,{method:'POST',headers:{apikey:K,Authorization:'Bearer '+K,'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify({code:code,host_id:id})});
+  const t=await r.text();
+  if(!r.ok){o.textContent='❌ HTTP '+r.status+'\n'+t;return}
+  o.textContent='✅ تم إنشاء الغرفة بنجاح\nكود الغرفة: '+code+'\n\nالآن الاتصال بقاعدة البيانات شغال.';
+ }catch(e){o.textContent='❌ فشل الاتصال\n'+e.name+': '+e.message}
+});
+</script></body></html>
