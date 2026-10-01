@@ -10,8 +10,24 @@ const URL='https://rkebomshpuwllklvfpaw.supabase.co',KEY='sb_publishable_WXN_0Yb
 const sb=supabase.createClient(URL,KEY);let room='',me={id:localStorage.zozaPid||crypto.randomUUID(),name:'',x:45,y:300,vy:0,on:false,avatar:'🧑🏻'},others={},keys={l:false,r:false},hearts=[],level=1,channel=null,lastSync=0;localStorage.zozaPid=me.id;
 const $=id=>document.getElementById(id);function setStatus(s){$('status').textContent=s}
 function randCode(){return Math.random().toString(36).slice(2,7).toUpperCase()}
-async function createRoom(){me.name=$('name').value.trim()||'Zizo';room=randCode();let {error}=await sb.from('rooms').insert({code:room,host_id:me.id});if(error)return setStatus('⚠️ '+error.message);await sb.from('game_state').insert({room_code:room});await enter()}
-async function joinRoom(){me.name=$('name').value.trim()||'Zoza';room=$('code').value.trim().toUpperCase();if(!room)return setStatus('اكتب كود الغرفة');let {data}=await sb.from('rooms').select('code,level').eq('code',room).maybeSingle();if(!data)return setStatus('الغرفة غير موجودة');level=data.level||1;await enter()}
+async function createRoom(){
+ setStatus('⏳ جاري إنشاء الغرفة...');
+ try{
+  me.name=$('name').value.trim()||'Zizo';room=randCode();
+  const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('انتهت مهلة الاتصال بـ Supabase')),10000));
+  const req=sb.from('rooms').insert({code:room,host_id:me.id}).select('code').single();
+  let {data,error}=await Promise.race([req,timeout]);
+  if(error)throw error;
+  setStatus('✅ تم إنشاء الغرفة '+room);
+  let gs=await sb.from('game_state').upsert({room_code:room});
+  if(gs.error)throw gs.error;
+  await enter();
+ }catch(err){
+  console.error(err);
+  setStatus('❌ '+(err?.message||String(err))+' — صوّر لي هذه الرسالة');
+ }
+}
+async function joinRoom(){setStatus('⏳ جاري دخول الغرفة...');try{me.name=$('name').value.trim()||'Zoza';room=$('code').value.trim().toUpperCase();if(!room)return setStatus('اكتب كود الغرفة');let {data,error}=await sb.from('rooms').select('code,level').eq('code',room).maybeSingle();if(error)throw error;if(!data)return setStatus('الغرفة غير موجودة');level=data.level||1;await enter()}catch(err){setStatus('❌ '+(err?.message||String(err))+' — صوّر لي هذه الرسالة')}}
 async function enter(){await sb.from('players').upsert({id:me.id,room_code:room,name:me.name,avatar:me.name.toLowerCase().includes('zoza')?'👩🏻':'🧑🏻',online:true,last_seen:new Date().toISOString()});$('lobby').style.display='none';$('game').style.display='block';$('roomCode').textContent=room;makeLevel();await loadAll();subscribe();requestAnimationFrame(loop);setInterval(heartbeat,10000)}
 async function loadAll(){let p=await sb.from('players').select('*').eq('room_code',room);others={};(p.data||[]).forEach(x=>{if(x.id!==me.id)others[x.id]=x});renderPlayers();let m=await sb.from('messages').select('*').eq('room_code',room).order('created_at').limit(80);$('msgs').innerHTML='';(m.data||[]).forEach(addMsg);let r=await sb.from('rooms').select('*').eq('code',room).single();if(r.data){level=r.data.level;sharedHearts=r.data.hearts||0;$('level').textContent='Level '+level+' • ❤️ '+sharedHearts+'/8'}}
 function subscribe(){channel=sb.channel('room-'+room).on('postgres_changes',{event:'*',schema:'public',table:'players',filter:'room_code=eq.'+room},p=>{let x=p.new;if(!x||x.id===me.id)return;if(p.eventType==='DELETE')delete others[p.old.id];else others[x.id]=x;renderPlayers()}).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'room_code=eq.'+room},p=>addMsg(p.new)).on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:'code=eq.'+room},p=>{level=p.new.level;sharedHearts=p.new.hearts;$('level').textContent='Level '+level+' • ❤️ '+sharedHearts+'/8';if(level!==builtLevel)makeLevel()}).subscribe()}
