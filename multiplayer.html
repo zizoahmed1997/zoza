@@ -1,31 +1,35 @@
 <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Zoza Together ❤️</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>*{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial;background:linear-gradient(145deg,#f8eef2,#e9ccd7);color:#432432;min-height:100vh}.wrap{max-width:900px;margin:auto;padding:18px}.card{background:#ffffffd9;border:1px solid #fff;border-radius:28px;padding:20px;box-shadow:0 18px 50px #5b203822}.btn{border:0;border-radius:999px;padding:12px 18px;font-weight:800;background:#8f3a5b;color:#fff;cursor:pointer}.ghost{background:#fff;color:#8f3a5b;border:1px solid #d9a8ba}.input{padding:13px;border:1px solid #d9a8ba;border-radius:14px;width:100%;font-size:16px}.join{display:grid;gap:10px;max-width:440px;margin:30px auto}.game{display:none}.top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.players{display:flex;gap:8px;flex-wrap:wrap}.pill{background:#f6e7ec;border-radius:99px;padding:7px 11px;font-size:13px;font-weight:bold}.layout{display:grid;grid-template-columns:1fr 300px;gap:14px;margin-top:14px}canvas{width:100%;background:#f7dce5;border:2px solid #9f3f62;border-radius:20px;touch-action:none}.chat{height:420px;display:flex;flex-direction:column;border:1px solid #e3becb;border-radius:20px;overflow:hidden;background:#fff}.msgs{flex:1;overflow:auto;padding:10px}.msg{background:#f6e7ec;border-radius:14px;padding:8px 10px;margin:6px 0}.msg b{color:#8f3a5b}.send{display:flex;gap:6px;padding:8px;border-top:1px solid #eee}.send input{min-width:0}.quick{display:flex;gap:5px;padding:5px 8px;justify-content:center}.controls{display:flex;justify-content:center;gap:12px;margin:10px}.status{font-size:13px;color:#8f3a5b;font-weight:bold}@media(max-width:700px){.layout{grid-template-columns:1fr}.chat{height:280px}}</style></head><body><div class="wrap"><div class="card">
-<div id="lobby"><h1>💗 Zoza Together</h1><p>العبوا واتكلموا مع بعض في نفس الغرفة ❤️</p><div class="join"><input class="input" id="name" placeholder="اسمك: Zizo أو Zoza"><button class="btn" onclick="createRoom()">✨ إنشاء غرفة خاصة</button><div style="text-align:center">أو</div><input class="input" id="code" maxlength="8" placeholder="كود الغرفة"><button class="btn ghost" onclick="joinRoom()">دخول الغرفة ❤️</button><a href="index.html" style="text-align:center;color:#8f3a5b">↩ الرجوع للموقع</a><div class="status" id="status"></div></div></div>
+<div id="lobby"><h1>💗 Zoza Together</h1><p>العبوا واتكلموا مع بعض في نفس الغرفة ❤️</p><div class="join"><input class="input" id="name" placeholder="اسمك: Zizo أو Zoza"><button class="btn" onclick="document.getElementById('status').textContent='⏳ جاري إنشاء الغرفة...';createRoom()">✨ إنشاء غرفة خاصة</button><div style="text-align:center">أو</div><input class="input" id="code" maxlength="8" placeholder="كود الغرفة"><button class="btn ghost" onclick="joinRoom()">دخول الغرفة ❤️</button><a href="index.html" style="text-align:center;color:#8f3a5b">↩ الرجوع للموقع</a><div class="status" id="status"></div></div></div>
 <div class="game" id="game"><div class="top"><div><b>Room: <span id="roomCode"></span></b> <button class="btn ghost" style="padding:6px 10px" onclick="copyCode()">📋</button><div class="status" id="level">Level 1 • ❤️ 0/8</div></div><div class="players" id="players"></div></div>
 <div class="layout"><div><canvas id="cv" width="560" height="420"></canvas><div class="controls"><button class="btn ghost" id="left">◀</button><button class="btn" id="jump">⬆ قفز</button><button class="btn ghost" id="right">▶</button></div><div style="text-align:center;font-size:13px">اجمعوا 8 قلوب معًا وافتحوا البوابة 💗</div></div>
 <div class="chat"><div class="msgs" id="msgs"></div><div class="quick"><button onclick="quick('❤️')">❤️</button><button onclick="quick('🌹')">🌹</button><button onclick="quick('بحبك ❤️')">بحبك</button><button onclick="quick('يلا 😂')">😂</button></div><div class="send"><input class="input" id="msg" placeholder="اكتب رسالة…" onkeydown="if(event.key==='Enter')sendMsg()"><button class="btn" onclick="sendMsg()">إرسال</button></div></div></div></div>
 </div></div><script>
 const URL='https://rkebomshpuwllklvfpaw.supabase.co',KEY='sb_publishable_WXN_0YbN-zOluH_4-EmazQ_nWzk0m7d';
-const sb=supabase.createClient(URL,KEY);let room='',me={id:localStorage.zozaPid||crypto.randomUUID(),name:'',x:45,y:300,vy:0,on:false,avatar:'🧑🏻'},others={},keys={l:false,r:false},hearts=[],level=1,channel=null,lastSync=0;localStorage.zozaPid=me.id;
+window.addEventListener('error',e=>{const s=document.getElementById('status');if(s)s.textContent='❌ JavaScript: '+e.message});
+const REST=URL+'/rest/v1/';
+async function api(path,options={}){
+ const h={apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json',...(options.headers||{})};
+ const r=await fetch(REST+path,{...options,headers:h});
+ const body=await r.text();
+ if(!r.ok) throw new Error('Supabase '+r.status+': '+body.slice(0,240));
+ return body?JSON.parse(body):null;
+}
+const sb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(URL,KEY):null;let room='',me={id:localStorage.zozaPid||crypto.randomUUID(),name:'',x:45,y:300,vy:0,on:false,avatar:'🧑🏻'},others={},keys={l:false,r:false},hearts=[],level=1,channel=null,lastSync=0;localStorage.zozaPid=me.id;
 const $=id=>document.getElementById(id);function setStatus(s){$('status').textContent=s}
 function randCode(){return Math.random().toString(36).slice(2,7).toUpperCase()}
 async function createRoom(){
  setStatus('⏳ جاري إنشاء الغرفة...');
  try{
-  me.name=$('name').value.trim()||'Zizo';room=randCode();
-  const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('انتهت مهلة الاتصال بـ Supabase')),10000));
-  const req=sb.from('rooms').insert({code:room,host_id:me.id}).select('code').single();
-  let {data,error}=await Promise.race([req,timeout]);
-  if(error)throw error;
-  setStatus('✅ تم إنشاء الغرفة '+room);
-  let gs=await sb.from('game_state').upsert({room_code:room});
-  if(gs.error)throw gs.error;
+  me.name=$('name').value.trim()||'Zizo'; room=randCode();
+  const rows=await api('rooms',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({code:room,host_id:me.id})});
+  if(!rows||!rows.length) throw new Error('لم يتم إرجاع بيانات الغرفة');
+  await api('game_state',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({room_code:room})});
+  setStatus('✅ تم إنشاء الغرفة: '+room);
+  if(!sb){setStatus('✅ الغرفة '+room+' اتعملت، لكن Realtime لم يتحمل. اعمل Refresh.');return}
   await enter();
- }catch(err){
-  console.error(err);
-  setStatus('❌ '+(err?.message||String(err))+' — صوّر لي هذه الرسالة');
- }
+ }catch(err){console.error(err);setStatus('❌ '+(err?.message||String(err)))}
 }
 async function joinRoom(){setStatus('⏳ جاري دخول الغرفة...');try{me.name=$('name').value.trim()||'Zoza';room=$('code').value.trim().toUpperCase();if(!room)return setStatus('اكتب كود الغرفة');let {data,error}=await sb.from('rooms').select('code,level').eq('code',room).maybeSingle();if(error)throw error;if(!data)return setStatus('الغرفة غير موجودة');level=data.level||1;await enter()}catch(err){setStatus('❌ '+(err?.message||String(err))+' — صوّر لي هذه الرسالة')}}
 async function enter(){await sb.from('players').upsert({id:me.id,room_code:room,name:me.name,avatar:me.name.toLowerCase().includes('zoza')?'👩🏻':'🧑🏻',online:true,last_seen:new Date().toISOString()});$('lobby').style.display='none';$('game').style.display='block';$('roomCode').textContent=room;makeLevel();await loadAll();subscribe();requestAnimationFrame(loop);setInterval(heartbeat,10000)}
