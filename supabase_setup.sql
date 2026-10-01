@@ -64,3 +64,12 @@ alter publication supabase_realtime add table public.rooms;
 alter publication supabase_realtime add table public.players;
 alter publication supabase_realtime add table public.messages;
 alter publication supabase_realtime add table public.game_state;
+
+
+-- Browser client permissions (required because "Automatically expose new tables" is disabled)
+grant usage on schema public to anon, authenticated;
+grant select, insert, update, delete on table public.rooms to anon, authenticated;
+grant select, insert, update, delete on table public.players to anon, authenticated;
+grant select, insert, update, delete on table public.messages to anon, authenticated;
+grant select, insert, update, delete on table public.game_state to anon, authenticated;
+grant usage, select on sequence public.messages_id_seq to anon, authenticated;
